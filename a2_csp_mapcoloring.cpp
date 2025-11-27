@@ -1,7 +1,6 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-vector<string> colors = {"Red", "Green", "Blue"};
 vector<string> order = {"SA", "WA", "NT", "Q", "NSW", "V", "T"};
 
 map<string, vector<string>> adj;
@@ -17,6 +16,7 @@ bool solve(int idx) {
     for (string c : domain[region]) {
         bool ok = true;
 
+        // Check neighbors
         for (string n : adj[region]) {
             if (assignment.count(n) && assignment[n] == c) {
                 ok = false;
@@ -29,6 +29,7 @@ bool solve(int idx) {
         assignment[region] = c;
         map<string, vector<string>> oldDomain = domain;
 
+        // Forward checking
         for (string n : adj[region]) {
             auto &d = domain[n];
             d.erase(remove(d.begin(), d.end(), c), d.end());
@@ -37,6 +38,7 @@ bool solve(int idx) {
         if (solve(idx + 1))
             return true;
 
+        // Backtrack
         assignment.erase(region);
         domain = oldDomain;
     }
@@ -45,6 +47,7 @@ bool solve(int idx) {
 }
 
 int main() {
+    // Hardcoded adjacency (as before)
     adj["WA"]  = {"NT", "SA"};
     adj["NT"]  = {"WA", "SA", "Q"};
     adj["SA"]  = {"WA", "NT", "Q", "NSW", "V"};
@@ -53,11 +56,19 @@ int main() {
     adj["V"]   = {"SA", "NSW"};
     adj["T"]   = {};
 
+    vector<string> colors(3);
+
+    cout << "Enter 3 available colors:\n";
+    for (int i = 0; i < 3; i++) {
+        cin >> colors[i];
+    }
+
+    // Initialize domains for each region
     for (string r : order)
         domain[r] = colors;
 
     if (solve(0)) {
-        cout << "Solution:\n";
+        cout << "\n--- Solution ---\n";
         for (auto &p : assignment)
             cout << p.first << " -> " << p.second << "\n";
     } else {
