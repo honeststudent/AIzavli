@@ -3,7 +3,7 @@ using namespace std;
 
 struct Person {
     string name;
-    string gender;  // "male" or "female"
+    string gender; 
     vector<Person*> parents;
     vector<Person*> children;
 
@@ -73,26 +73,27 @@ public:
         return {grandmothers.begin(), grandmothers.end()};
     }
 
-    // Parse query: "relationship of person"
     bool parseQuery(const string& query, string& relationship, string& person) {
         regex pattern(R"((\w+)\s+of\s+(\w+))");
         smatch matches;
         string lowerQuery = query;
         transform(lowerQuery.begin(), lowerQuery.end(), lowerQuery.begin(), ::tolower);
+
         if (regex_match(lowerQuery, matches, pattern)) {
             relationship = matches[1].str();
             person = matches[2].str();
-            // Capitalize person name
+
             if (!person.empty()) person[0] = toupper(person[0]);
             return true;
         }
         return false;
     }
 
-    string queryRelationship(const string& query) {
+    void queryRelationship(const string& query) {
         string relationship, person;
         if (!parseQuery(query, relationship, person)) {
-            return "Invalid query format. Use 'relationship of person' e.g., 'father of kate'";
+            cout << "Invalid query format. Use 'father of kate'\n";
+            return;
         }
 
         vector<string> results;
@@ -101,30 +102,30 @@ public:
         } else if (relationship == "grandmother") {
             results = getGrandmother(person);
         } else {
-            return "Unsupported relationship: " + relationship;
+            cout << "Unsupported relationship: " << relationship << "\n";
+            return;
         }
 
         if (results.empty()) {
             results.push_back("No " + relationship + " found");
         }
 
-        // Format as slide
         string resultStr = "\n";
-       
-        resultStr += "            " + relationship.substr(0,1) + relationship.substr(1) + " of " + person + "\n";  // Capitalize relationship
+        resultStr += "            " + relationship.substr(0,1) + relationship.substr(1) + " of " + person + "\n";
         resultStr += "--------------------------------------------------\n";
         for (const auto& res : results) {
-            resultStr += "| " + res + string(50 - res.length(), ' ') + "|\n";  // Pad for alignment
+            resultStr += "| " + res + string(50 - res.length(), ' ') + "|\n";
         }
         resultStr += "--------------------------------------------------\n";
-        return resultStr;
+
+        cout << resultStr;
     }
 };
 
 int main() {
     FamilyTree tree;
 
-    // Add sample family tree
+    // Sample tree
     tree.addParentChild("John", "male", "Bob", "male");
     tree.addParentChild("Mary", "female", "Bob", "male");
     tree.addParentChild("Bob", "male", "Kate", "female");
@@ -132,12 +133,20 @@ int main() {
     tree.addParentChild("Bob", "male", "Frank", "male");
     tree.addParentChild("Alice", "female", "Frank", "male");
 
-    // Get user input
-    string query;
-    cout << "Enter query (e.g., 'father of kate'): ";
-    getline(cin, query);
+    char choice;
 
-    cout << tree.queryRelationship(query) << endl;
+    do {
+        string query;
+        cout << "Enter query (e.g., 'father of kate'): ";
+        getline(cin, query);
+
+        tree.queryRelationship(query);
+
+        cout << "Do u wanna continue? (y/n): ";
+        cin >> choice;
+        cin.ignore(); // clear input buffer
+
+    } while(choice == 'y' || choice == 'Y');
 
     return 0;
 }
