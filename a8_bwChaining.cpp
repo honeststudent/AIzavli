@@ -4,13 +4,13 @@
 #include <string>
 using namespace std;
 
-// Rule structure: conditions → conclusion
+
 struct Rule {
     vector<string> conditions;
     string conclusion;
 };
 
-// Backward chaining function
+
 bool backwardChaining(const string &goal, const set<string> &facts, const vector<Rule> &rules, set<string> &proven) {
     // If goal is already a known fact
     if (facts.find(goal) != facts.end()) {
@@ -73,3 +73,4 @@ int main() {
 
     return 0;
 }
+
